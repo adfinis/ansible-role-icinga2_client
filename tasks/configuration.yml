@@ -1,1 +1,25 @@
 ---
+
+- name: remove conf.d folder
+  file:
+    path: "/etc/icinga2/conf.d"
+    state: absent
+  notify: "reload icinga2 daemon"
+
+- name: install icinga2 configuration
+  template:
+    src: templates/etc/icinga2/icinga2.conf.j2
+    dest: /etc/icinga2/icinga2.conf
+  notify: "reload icinga2 daemon"
+
+- name: install icinga2 zones configuration
+  template:
+    src: templates/etc/icinga2/zones.conf.j2
+    dest: /etc/icinga2/zones.conf
+  notify: "reload icinga2 daemon"
+
+- name: install icinga2 constants configuration
+  template:
+    src: templates/etc/icinga2/constants.conf.j2
+    dest: /etc/icinga2/constants.conf
+  notify: "reload icinga2 daemon"

@@ -1,1 +1,5 @@
 ---
+
+icinga2_client_api_url: "http://monitoring.example.com:5665"
+icinga2_client_api_user: "root"
+icinga2_client_api_pass: "v3rys3cur3p455"

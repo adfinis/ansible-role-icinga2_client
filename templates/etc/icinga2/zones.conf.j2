@@ -1,0 +1,13 @@
+/**
+ *  {{ ansible_managed }}
+ */
+// todo satellite zone
+
+object Endpoint "icinga-master" {
+  host = "192.168.122.148"
+  port = "5665"
+}
+
+object Zone "monitoring-master" {
+  endpoints = [ "icinga-master" ]
+}
