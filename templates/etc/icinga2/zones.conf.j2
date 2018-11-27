@@ -3,11 +3,15 @@
  */
 // todo satellite zone
 
+object Zone "global-templates" {
+  global = true
+}
+
 object Endpoint "icinga-master" {
   host = "192.168.122.148"
   port = "5665"
 }
 
-object Zone "monitoring-master" {
+object Zone "icinga-master" {
   endpoints = [ "icinga-master" ]
 }
