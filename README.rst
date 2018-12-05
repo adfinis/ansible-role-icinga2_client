@@ -11,16 +11,8 @@ ROLE ICINGA2_CLIENT
 .. image:: https://img.shields.io/badge/galaxy-adfinis--sygroup.icinga2_client-660198.svg?style=flat-square
   :target: https://galaxy.ansible.com/adfinis-sygroup/icinga2_client
 
-A brief description of the role goes here.
-
-
-Requirements
-=============
-
-Any pre-requisites that may not be covered by Ansible itself or the role
-should be mentioned here. For instance, if the role uses the EC2 module, it
-may be a good idea to mention in this section that the boto package is required.
-
+This role is used to configure the icinga2 client and request certificates from
+the icinga2 master,
 
 Role Variables
 ===============
@@ -35,22 +27,21 @@ should be mentioned here as well.
 Dependencies
 =============
 
-A list of other roles hosted on Galaxy should go here, plus any details in
-regards to parameters that may need to be set for other roles, or variables
-that are used from other roles.
+This role depends on the role `adfinis-sygroup.icinga2_agent <https://galaxy.ansible.com/adfinis-sygroup/icinga2_agent>`_, which installs
+the icinga2 binary.
+
 
 
 Example Playbook
 =================
 
-Including an example of how to use your role (for instance, with variables
-passed in as parameters) is always nice for users too:
 
 .. code-block:: yaml
 
   - hosts: servers
     roles:
-       - { role: adfinis-sygroup.icinga2_client }
+     - { role: adfinis-sygroup.icinga2_agent }
+     - { role: adfinis-sygroup.icinga2_client }
 
 
 License
