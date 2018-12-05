@@ -26,3 +26,9 @@ galaxy_info:
         - 7
   galaxy_tags:
     - "icinga2"
+    - "client"
+    - "monitoring"
+    - "certificates"
+    - "adfinis"
+    - "sygroup"
+    - "adfinis-sygroup.ch"
