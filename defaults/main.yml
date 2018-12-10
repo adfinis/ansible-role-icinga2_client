@@ -1,7 +1,10 @@
 ---
 
+# The icinga2 master fqdn
+icinga2_client_master_fqdn: "monitoring.example.com"
+
 # The API url of the icinga2 master
-icinga2_client_api_url: "http://monitoring.example.com:5665"
+icinga2_client_api_url: "https://{{ icinga2_client_master_fqdn }}:5665"
 
 # The API user of the icinga2 master
 icinga2_client_api_user: "root"

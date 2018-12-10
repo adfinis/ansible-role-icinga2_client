@@ -1,5 +1,6 @@
 ---
 
+# TODO: Only request ticket when needed
 - name: get ticket from master
   uri:
     url: '{{ icinga2_client_api_url }}/v1/actions/generate-ticket'
@@ -13,74 +14,28 @@
     headers:
       Accept: 'application/json'
     validate_certs : no
-  register: icinga2_client_ticket
+  register: icinga2_client_register_ticket
 
-# - name: generate ticket on master
-#   shell: "icinga2 pki ticket --cn {{ inventory_hostname }} --salt {{ icinga2_salt }}"
-#   register: icinga2_client_ticket
-#   delegate_to: "{{ icinga2_master_fqdn }}"
+# - name: ticket and fqdn
+#   debug:
+#     msg: "{{ icinga2_client_register_ticket.json.results.0.ticket }}: is for {{ inventory_hostname }}"
 
-- name: Ticket generated!
-  debug:
-    msg: "{{ icinga2_client_ticket }}"
+- name: get ca from icinga2 masters
+  command: |
+    icinga2 pki save-cert --host {{ icinga2_client_master_fqdn }} \
+    --trustedcert /var/lib/icinga2/certs/icinga2_master_ca.crt
+  args:
+    creates: /var/lib/icinga2/certs/icinga2_master_ca.crt
 
-- name: Ticket and fqdn
-  debug:
-    msg: "{{ icinga2_client_ticket }} : is for {{ inventory_hostname }}"
-
-# - name: create pki folder on clients
-#   file:
-#     dest: /etc/icinga2/pki
-#     state: directory
-#     mode: 0700
-#     owner: icinga
-#     group: icinga
-#
-# - name: create cert
-#   shell: |
-#     {{ icinga2_binary }} pki new-cert \
-#     --cn {{ inventory_hostname }} \
-#     --key /etc/icinga2/pki/{{ inventory_hostname }}.key \
-#     --cert /etc/icinga2/pki/{{ inventory_hostname }}.crt \
-#
-# - name: save the masters cert as trustedcert
-#   shell: |
-#     {{ icinga2_binary }} pki save-cert \
-#     --key /etc/icinga2/pki/{{ inventory_hostname }}.key \
-#     --cert /etc/icinga2/pki/{{ inventory_hostname }}.crt \
-#     --trustedcert /etc/icinga2/pki/trusted-master.crt \
-#     --host {{ icinga2_master_fqdn }}
-#
-# - name: request the certificate from the icinga server
-#   shell: |
-#     {{ icinga2_binary }} pki request \
-#     --host {{ icinga2_master_fqdn }} \
-#     --port {{ icinga2_api_port }} \
-#     --ticket {{ icinga2_client_ticket['stdout'] }} \
-#     --key /etc/icinga2/pki/{{ inventory_hostname }}.key \
-#     --cert /etc/icinga2/pki/{{ inventory_hostname }}.crt \
-#     --trustedcert /etc/icinga2/pki/trusted-master.crt --ca /etc/icinga2/pki/ca.key
-#
-#     #- name: node setup
-#     #  shell: |
-#     #    {{ icinga2_binary }} node setup \
-#     #    --ticket {{ icinga2_client_ticket['stdout'] }} \
-#     #    --endpoint {{ icinga2_master_fqdn }} \
-#     #    --zone {{ inventory_hostname }} \
-#     #    --master_host {{ icinga2_master_fqdn }} \
-#     #    --trustedcert /etc/icinga2/pki/trusted-master.crt \
-#     #    --cn {{ inventory_hostname }} \
-#     #    --accept-commands \
-#     #    --accept-config
-#
-# - name: get certificate fingerprint
-#   shell: |
-#     openssl x509 \
-#     -in /etc/icinga2/pki/{{ inventory_hostname }}.crt \
-#     -fingerprint -sha256 -noout | cut -d '=' -f 2 | sed 's/://g' | tr A-Z a-z
-#   register: icinga2_fingerprint
-#
-# - name: sign certificate request on master
-#   shell: |
-#     {{ icinga2_binary }} ca sign {{ icinga2_fingerprint['stdout'] }}
-#   delegate_to: "{{ icinga2_master_fqdn }}"
+- name: setup node and get certificates signed
+  command: |
+    icinga2 node setup \
+    --zone {{ inventory_hostname }} \
+    --endpoint {{ icinga2_client_master_fqdn }} \
+    --parent_host {{ icinga2_client_master_fqdn }} \
+    --parent_zone {{ icinga2_client_master_fqdn }} \
+    --ticket {{ icinga2_client_register_ticket.json.results.0.ticket }} \
+    --trustedcert /tmp/icinga2_master_ca.crt \
+    --accept-config --accept-commands
+  args:
+    creates: /var/lib/icinga2/certs/ca.crt
