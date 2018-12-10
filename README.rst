@@ -12,7 +12,7 @@ ROLE ICINGA2_CLIENT
   :target: https://galaxy.ansible.com/adfinis-sygroup/icinga2_client
 
 This role is used to configure the icinga2 client and request certificates from
-the icinga2 master,
+the icinga2 master.
 
 Role Variables
 ===============
