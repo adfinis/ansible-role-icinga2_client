@@ -1,17 +1,25 @@
 /**
  *  {{ ansible_managed }}
  */
+
 // todo satellite zone
 
 object Zone "global-templates" {
   global = true
 }
 
-object Endpoint "icinga-master" {
-  host = "192.168.122.148"
-  port = "5665"
+object Endpoint "{{ icinga2_client_master_fqdn }}" {
+  host = "{{ icinga2_client_master_fqdn }}"
 }
 
-object Zone "icinga-master" {
-  endpoints = [ "icinga-master" ]
+object Zone "{{ icinga2_client_master_fqdn }}" {
+  endpoints = [ "{{ icinga2_client_master_fqdn }}" ]
+}
+
+object Endpoint "{{ inventory_hostname }}" {
+}
+
+object Zone "{{ inventory_hostname }}" {
+  endpoints = [ "{{ inventory_hostname }}" ]
+  parent = "{{ icinga2_client_master_fqdn }}"
 }

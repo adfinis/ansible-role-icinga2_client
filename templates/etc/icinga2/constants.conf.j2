@@ -29,4 +29,4 @@ const NodeName = "{{ inventory_hostname }}"
 const ZoneName = "{{ inventory_hostname }}"
 
 /* Secret key for remote node tickets */
-const TicketSalt = "{{ icinga2_salt|default("") }}"
+const TicketSalt = "{{ icinga2_master_ticket_salt|default("") }}"
