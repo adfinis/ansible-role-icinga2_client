@@ -35,7 +35,7 @@
     --parent_host {{ icinga2_client_master_fqdn }} \
     --parent_zone {{ icinga2_client_master_fqdn }} \
     --ticket {{ icinga2_client_register_ticket.json.results.0.ticket }} \
-    --trustedcert /tmp/icinga2_master_ca.crt \
+    --trustedcert /var/lib/icinga2/certs/icinga2_master_ca.crt \
     --accept-config --accept-commands
   args:
     creates: /var/lib/icinga2/certs/ca.crt
