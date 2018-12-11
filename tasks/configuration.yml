@@ -11,7 +11,7 @@
     serole: object_r
     setype: icinga2_etc_t
     selevel: s0
-    notify: "icinga2_client reload icinga2"
+  notify: "icinga2_client reload icinga2"
 
 - name: install icinga2 zones configuration
   template:
