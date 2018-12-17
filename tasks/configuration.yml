@@ -1,5 +1,12 @@
 ---
 
+# Icinga2 currently supports only two endpoints.
+# https://github.com/Icinga/icinga2/issues/3533
+- name: fail when more than 2 icinga2 endpoints are defined
+  fail:
+    msg: No more than 2 Endpoints allowed
+  when: icinga2_client_monitoring_parents | length > 2
+
 - name: install icinga2 configuration
   template:
     src: templates/etc/icinga2/icinga2.conf.j2
@@ -13,10 +20,10 @@
     selevel: s0
   notify: "icinga2_client reload icinga2"
 
-- name: install icinga2 zones configuration
+- name: install icinga2 constants configuration
   template:
-    src: templates/etc/icinga2/zones.conf.j2
-    dest: /etc/icinga2/zones.conf
+    src: templates/etc/icinga2/constants.conf.j2
+    dest: /etc/icinga2/constants.conf
     owner: icinga
     group: icinga
     mode: 0644
@@ -26,10 +33,10 @@
     selevel: s0
   notify: "icinga2_client reload icinga2"
 
-- name: install icinga2 constants configuration
+- name: install icinga2 zones configuration
   template:
-    src: templates/etc/icinga2/constants.conf.j2
-    dest: /etc/icinga2/constants.conf
+    src: templates/etc/icinga2/zones.conf.j2
+    dest: /etc/icinga2/zones.conf
     owner: icinga
     group: icinga
     mode: 0644

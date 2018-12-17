@@ -1,25 +1,26 @@
-/**
- *  {{ ansible_managed }}
- */
-
-// todo satellite zone
+{{ ansible_managed | comment('c') }}
 
 object Zone "global-templates" {
   global = true
 }
 
-object Endpoint "{{ icinga2_client_master_fqdn }}" {
-  host = "{{ icinga2_client_master_fqdn }}"
+{# each parent host gets an endpoint definition#}
+{% for item in icinga2_client_monitoring_parents %}
+object Endpoint "{{ item }}" {
+  host = "{{ item }}"
 }
+{% endfor %}
 
-object Zone "{{ icinga2_client_master_fqdn }}" {
-  endpoints = [ "{{ icinga2_client_master_fqdn }}" ]
+{# Each endpoint is configured in a zone #}
+object Zone "{{ icinga2_client_parent_zone }}" {
+  endpoints = [ "{{ icinga2_client_monitoring_parents |  join('", "') }}" ]
 }
 
 object Endpoint "{{ inventory_hostname }}" {
+  host = name
 }
 
 object Zone "{{ inventory_hostname }}" {
   endpoints = [ "{{ inventory_hostname }}" ]
-  parent = "{{ icinga2_client_master_fqdn }}"
+  parent = "{{ icinga2_client_parent_zone }}"
 }
