@@ -17,11 +17,26 @@ the icinga2 master.
 Role Variables
 ===============
 
-A description of the settable variables for this role should go here, including
-any variables that are in defaults/main.yml, vars/main.yml, and any variables
-that can/should be set via parameters to the role. Any variables that are read
-from other roles and/or the global scope (ie. hostvars, group vars, etc.)
-should be mentioned here as well.
+.. code-block:: yaml
+
+  # The icinga2 parent hosts. Only 2 allowed.
+  # https://github.com/Icinga/icinga2/issues/3533
+  icinga2_client_monitoring_parents:
+    - monitoring-master1.example.com
+    - monitoring-master2.example.com
+
+  # The default icinga2 parent zone
+  icinga2_client_parent_zone: "monitoring-master"
+
+  # The API url of the icinga2 master. Defaults to the first parent
+  icinga2_client_api_url: "https://{{ icinga2_client_master_fqdn[0] }}:5665"
+
+  # The API user of the icinga2 master
+  # The user needs at least permissions to create ticket tokens.
+  icinga2_client_api_user: "root"
+
+  # The API password of the icinga2 master
+  icinga2_client_api_pass: "v3rys3cur3p455"
 
 
 Dependencies
@@ -29,7 +44,6 @@ Dependencies
 
 This role depends on the role `adfinis-sygroup.icinga2_agent <https://galaxy.ansible.com/adfinis-sygroup/icinga2_agent>`_, which installs
 the icinga2 binary.
-
 
 
 Example Playbook
