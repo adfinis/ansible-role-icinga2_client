@@ -42,7 +42,8 @@ Role Variables
 Dependencies
 =============
 
-This role depends on the role `adfinis-sygroup.icinga2_agent <https://galaxy.ansible.com/adfinis-sygroup/icinga2_agent>`_, which installs
+This role depends on the role `adfinis-sygroup.icinga2_agent 
+<https://galaxy.ansible.com/adfinis-sygroup/icinga2_agent>`_, which installs
 the icinga2 binary.
 
 
