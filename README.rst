@@ -29,7 +29,7 @@ Role Variables
   icinga2_client_parent_zone: "monitoring-master"
 
   # The API url of the icinga2 master. Defaults to the first parent
-  icinga2_client_api_url: "https://{{ icinga2_client_master_fqdn[0] }}:5665"
+  icinga2_client_api_url: "https://{{ icinga2_client_monitoring_parents[0] }}:5665"
 
   # The API user of the icinga2 master
   # The user needs at least permissions to create ticket tokens.
