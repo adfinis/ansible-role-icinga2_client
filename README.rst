@@ -36,7 +36,7 @@ Role Variables
   icinga2_client_api_user: "root"
 
   # The API password of the icinga2 master
-  icinga2_client_api_pass: "v3rys3cur3p455"
+  icinga2_client_api_pass: "passw0rd"
 
 
 Dependencies
