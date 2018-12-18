@@ -4,7 +4,7 @@
 # https://github.com/Icinga/icinga2/issues/3533
 - name: fail when more than 2 icinga2 endpoints are defined
   fail:
-    msg: No more than 2 Endpoints allowed
+    msg: No more than 2 endpoints allowed
   when: icinga2_client_monitoring_parents | length > 2
 
 - name: install icinga2 configuration
