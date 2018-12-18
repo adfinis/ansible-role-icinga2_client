@@ -1,6 +1,10 @@
 ---
 
-# TODO: Only request ticket when needed
+- name: check if rules file exists
+  stat: 
+    path: /var/lib/icinga2/certs/ticket
+  register: icinga2_client_ticket_generated
+
 - name: get ticket from master
   uri:
     url: '{{ icinga2_client_api_url }}/v1/actions/generate-ticket'
@@ -15,6 +19,7 @@
       Accept: 'application/json'
     validate_certs : no
   register: icinga2_client_register_ticket
+  when: icinga2_client_ticket_generated.stat.exists == false
 
 # - name: ticket and fqdn
 #   debug:
@@ -33,9 +38,10 @@
     --zone {{ inventory_hostname }} \
     --endpoint {{ icinga2_client_monitoring_parents[0] }} \
     --parent_host {{ icinga2_client_monitoring_parents[0] }} \
-    --parent_zone {{ icinga2_client_monitoring_parents[0] }} \
+    --parent_zone {{ icinga2_client_parent_zone }} \
     --ticket {{ icinga2_client_register_ticket.json.results.0.ticket }} \
     --trustedcert /var/lib/icinga2/certs/icinga2_master_ca.crt \
     --accept-config --accept-commands
   args:
     creates: /var/lib/icinga2/certs/ca.crt
+  when: icinga2_client_ticket_generated.stat.exists == false
