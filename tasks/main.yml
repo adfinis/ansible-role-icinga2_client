@@ -7,7 +7,6 @@
     - '{{ ansible_os_family }}.yml'
   tags:
     - 'role::icinga2_client'
-    - 'role::icinga2_client:install'
     - 'role::icinga2_client:config'
 
 - import_tasks: configuration.yml
