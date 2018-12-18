@@ -1,7 +1,7 @@
 ---
 
 - name: check if rules file exists
-  stat: 
+  stat:
     path: /var/lib/icinga2/certs/ticket
   register: icinga2_client_register_ticket_generated
 
