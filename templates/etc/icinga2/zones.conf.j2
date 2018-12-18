@@ -1,0 +1,29 @@
+/**
+ *  {{ ansible_managed }}
+ *  Configuration from Icinga2 version r2.10.2-1
+ */
+
+object Zone "global-templates" {
+  global = true
+}
+
+{# each parent host gets an endpoint definition#}
+{% for item in icinga2_client_monitoring_parents %}
+object Endpoint "{{ item }}" {
+  host = "{{ item }}"
+}
+{% endfor %}
+
+{# Each endpoint is configured in a zone #}
+object Zone "{{ icinga2_client_parent_zone }}" {
+  endpoints = [ "{{ icinga2_client_monitoring_parents |  join('", "') }}" ]
+}
+
+object Endpoint "{{ inventory_hostname }}" {
+  host = name
+}
+
+object Zone "{{ inventory_hostname }}" {
+  endpoints = [ "{{ inventory_hostname }}" ]
+  parent = "{{ icinga2_client_parent_zone }}"
+}

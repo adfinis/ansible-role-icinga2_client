@@ -1,68 +1,73 @@
-===============
-ROLE _TEMPLATE
-===============
+===================
+ROLE ICINGA2_CLIENT
+===================
 
-.. image:: https://img.shields.io/github/license/adfinis-sygroup/ansible-role-_template.svg?style=flat-square
-  :target: https://github.com/adfinis-sygroup/ansible-role-_template/blob/master/LICENSE
+.. image:: https://img.shields.io/github/license/adfinis-sygroup/ansible-role-icinga2_client.svg?style=flat-square
+  :target: https://github.com/adfinis-sygroup/ansible-role-icinga2_client/blob/master/LICENSE
 
-.. image:: https://img.shields.io/travis/adfinis-sygroup/ansible-role-_template.svg?style=flat-square
-  :target: https://travis-ci.org/adfinis-sygroup/ansible-role-_template
+.. image:: https://img.shields.io/travis/adfinis-sygroup/ansible-role-icinga2_client.svg?style=flat-square
+  :target: https://travis-ci.org/adfinis-sygroup/ansible-role-icinga2_client
 
-.. image:: https://img.shields.io/badge/galaxy-adfinis--sygroup._template-660198.svg?style=flat-square
-  :target: https://galaxy.ansible.com/adfinis-sygroup/_template
+.. image:: https://img.shields.io/badge/galaxy-adfinis--sygroup.icinga2_client-660198.svg?style=flat-square
+  :target: https://galaxy.ansible.com/adfinis-sygroup/icinga2_client
 
-A brief description of the role goes here.
-
-
-Requirements
-=============
-
-Any pre-requisites that may not be covered by Ansible itself or the role
-should be mentioned here. For instance, if the role uses the EC2 module, it
-may be a good idea to mention in this section that the boto package is required.
-
+This role is used to configure the icinga2 client and request certificates from
+the icinga2 master.
 
 Role Variables
 ===============
 
-A description of the settable variables for this role should go here, including
-any variables that are in defaults/main.yml, vars/main.yml, and any variables
-that can/should be set via parameters to the role. Any variables that are read
-from other roles and/or the global scope (ie. hostvars, group vars, etc.)
-should be mentioned here as well.
+.. code-block:: yaml
+
+  # The icinga2 parent hosts. Only 2 allowed.
+  # https://github.com/Icinga/icinga2/issues/3533
+  icinga2_client_monitoring_parents:
+    - monitoring-master1.example.com
+    - monitoring-master2.example.com
+
+  # The default icinga2 parent zone
+  icinga2_client_parent_zone: "monitoring-master"
+
+  # The API url of the icinga2 master. Defaults to the first parent
+  icinga2_client_api_url: "https://{{ icinga2_client_monitoring_parents[0] }}:5665"
+
+  # The API user of the icinga2 master
+  # The user needs at least permissions to create ticket tokens.
+  icinga2_client_api_user: "root"
+
+  # The API password of the icinga2 master
+  icinga2_client_api_pass: "passw0rd"
 
 
 Dependencies
 =============
 
-A list of other roles hosted on Galaxy should go here, plus any details in
-regards to parameters that may need to be set for other roles, or variables
-that are used from other roles.
+This role depends on the role `adfinis-sygroup.icinga2_agent 
+<https://galaxy.ansible.com/adfinis-sygroup/icinga2_agent>`_, which installs
+the icinga2 binary.
 
 
 Example Playbook
 =================
 
-Including an example of how to use your role (for instance, with variables
-passed in as parameters) is always nice for users too:
 
 .. code-block:: yaml
 
   - hosts: servers
     roles:
-       - { role: adfinis-sygroup._template }
+     - { role: adfinis-sygroup.icinga2_agent }
+     - { role: adfinis-sygroup.icinga2_client }
 
 
 License
 ========
 
-`GPL-3.0 <https://github.com/adfinis-sygroup/ansible-role-_template/blob/master/LICENSE>`_
+`GPL-3.0 <https://github.com/adfinis-sygroup/ansible-role-icinga2_client/blob/master/LICENSE>`_
 
 
 Author Information
 ===================
 
-_template role was written by:
+icinga2_client role was written by:
 
 * Adfinis SyGroup AG | `Website <https://www.adfinis-sygroup.ch/>`_ | `Twitter <https://twitter.com/adfinissygroup>`_ | `GitHub <https://github.com/adfinis-sygroup>`_
-
