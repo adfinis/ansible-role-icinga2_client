@@ -17,9 +17,9 @@
     body_format: 'json'
     headers:
       Accept: 'application/json'
-    validate_certs : no
+    validate_certs: no
   register: icinga2_client_register_ticket
-  when: icinga2_client_register_ticket_generated.stat.exists == false
+  when: not icinga2_client_register_ticket_generated.stat.exists
 
 # - name: ticket and fqdn
 #   debug:
@@ -44,4 +44,4 @@
     --accept-config --accept-commands
   args:
     creates: /var/lib/icinga2/certs/ca.crt
-  when: icinga2_client_register_ticket_generated.stat.exists == false
+  when: not icinga2_client_register_ticket_generated.stat.exists
