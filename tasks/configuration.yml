@@ -16,7 +16,7 @@
     mode: 0644
     seuser: system_u
     serole: object_r
-    setype: icinga2_etc_t
+    setype: etc_t
     selevel: s0
   notify: "icinga2_client reload icinga2"
 
@@ -29,7 +29,7 @@
     mode: 0644
     seuser: system_u
     serole: object_r
-    setype: icinga2_etc_t
+    setype: etc_t
     selevel: s0
   notify: "icinga2_client reload icinga2"
 
@@ -42,6 +42,6 @@
     mode: 0644
     seuser: system_u
     serole: object_r
-    setype: icinga2_etc_t
+    setype: etc_t
     selevel: s0
   notify: "icinga2_client reload icinga2"
