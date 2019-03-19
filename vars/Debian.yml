@@ -1,1 +1,7 @@
 ---
+
+# The user which files belong to
+icinga2_client_file_owner: nagios
+
+# The group which files belong to
+icinga2_client_file_group: nagios
