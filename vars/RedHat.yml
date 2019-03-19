@@ -1,1 +1,4 @@
 ---
+
+# The nagios plugins dir
+icinga2_client_plugin_dir: '/usr/lib64/nagios/plugins'

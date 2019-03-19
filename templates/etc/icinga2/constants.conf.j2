@@ -9,7 +9,7 @@
  */
 
 /* The directory which contains the plugins from the Monitoring Plugins project. */
-const PluginDir = "/usr/lib64/nagios/plugins"
+const PluginDir = "{{ icinga2_client_plugin_dir }}"
 
 /* The directory which contains the Manubulon plugins.
  * Check the documentation, chapter "SNMP Manubulon Plugin Check Commands", for details.
