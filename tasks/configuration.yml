@@ -11,8 +11,8 @@
   template:
     src: templates/etc/icinga2/icinga2.conf.j2
     dest: /etc/icinga2/icinga2.conf
-    owner: icinga
-    group: icinga
+    owner: '{{ icinga2_client_file_owner }}'
+    group: '{{ icinga2_client_file_group }}'
     mode: 0644
     seuser: system_u
     serole: object_r
@@ -24,8 +24,8 @@
   template:
     src: templates/etc/icinga2/constants.conf.j2
     dest: /etc/icinga2/constants.conf
-    owner: icinga
-    group: icinga
+    owner: '{{ icinga2_client_file_owner }}'
+    group: '{{ icinga2_client_file_group }}'
     mode: 0644
     seuser: system_u
     serole: object_r
@@ -37,8 +37,8 @@
   template:
     src: templates/etc/icinga2/zones.conf.j2
     dest: /etc/icinga2/zones.conf
-    owner: icinga
-    group: icinga
+    owner: '{{ icinga2_client_file_owner }}'
+    group: '{{ icinga2_client_file_group }}'
     mode: 0644
     seuser: system_u
     serole: object_r

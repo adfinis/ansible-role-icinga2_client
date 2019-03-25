@@ -1,5 +1,11 @@
 ---
 
+# The user which files belong to
+icinga2_client_file_owner: icinga
+
+# The group which files belong to
+icinga2_client_file_group: icinga
+
 # The nagios plugins dir
 icinga2_client_plugin_dir: '/usr/lib64/nagios/plugins'
 
