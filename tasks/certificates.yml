@@ -60,7 +60,7 @@
   copy:
     content: '{{ icinga2_client_register_ca["stdout"] }}'
     dest: /var/lib/icinga2/certs/icinga2_master_ca.crt
-  when: icinga2_client_master_reachable_host is not defined
+  when: icinga2_client_master_reachable_host is defined
 
 - name: setup node and get certificates signed
   command: |
