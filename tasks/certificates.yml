@@ -19,7 +19,7 @@
       Accept: 'application/json'
     validate_certs: no
   register: icinga2_client_register_ticket
-  when: not icinga2_client_register_ticket_generated.stat.exists and icinga2_client_master_reachable_host is not defined
+  when: icinga2_client_master_reachable_host is not defined and not icinga2_client_register_ticket_generated.stat.exists
 
 - name: get ticket from master (delegate)
   uri:
@@ -35,12 +35,12 @@
       Accept: 'application/json'
     validate_certs: no
   register: icinga2_client_register_ticket
-  when: not icinga2_client_register_ticket_generated.stat.exists and icinga2_client_master_reachable_host is defined
+  when: icinga2_client_master_reachable_host is defined and not icinga2_client_register_ticket_generated.stat.exists
   delegate_to: '{{ icinga2_client_master_reachable_host }}'
 
-- name: ticket and fqdn
-  debug:
-    msg: "{{ icinga2_client_register_ticket.json.results.0.ticket }}: is for {{ inventory_hostname }}"
+# - name: ticket and fqdn
+#   debug:
+#     msg: "{{ icinga2_client_register_ticket.json.results.0.ticket }}: is for {{ inventory_hostname }}"
 
 - name: get ca from icinga2 masters (direct)
   command: |
@@ -50,28 +50,75 @@
     creates: /var/lib/icinga2/certs/icinga2_master_ca.crt
   when: icinga2_client_master_reachable_host is not defined
 
+- name: check if ca file exists
+  stat:
+    path: /var/lib/icinga2/certs/ca.crt
+  register: icinga2_client_register_ca_created
+  when: icinga2_client_master_reachable_host is defined
+
 - name: get ca from icinga2 masters (delegate)
   command: cat /var/lib/icinga2/certs/ca.crt
   register: icinga2_client_register_ca
-  when: icinga2_client_master_reachable_host is defined
+  when: icinga2_client_master_reachable_host is defined and not icinga2_client_register_ca_created.stat.exists
   delegate_to: '{{ icinga2_client_master_reachable_host }}'
 
 - name: save ca from icinga2 master (delegate)
   copy:
     content: '{{ icinga2_client_register_ca["stdout"] }}'
-    dest: /var/lib/icinga2/certs/icinga2_master_ca.crt
-  when: icinga2_client_master_reachable_host is defined
+    dest: /var/lib/icinga2/certs/ca.crt
+  when: icinga2_client_master_reachable_host is defined and not icinga2_client_register_ca_created.stat.exists
 
-- name: setup node and get certificates signed
+- name: create new certs
+  command: >
+    icinga2 pki new-cert
+    --cn {{ inventory_hostname }}
+    --key /var/lib/icinga2/certs/{{ inventory_hostname }}.key
+    --cert /var/lib/icinga2/certs/{{ inventory_hostname }}.crt
+  register: icinga2_client_register_certs_created
+  when: icinga2_client_master_reachable_host is defined
+  args:
+    creates: /var/lib/icinga2/certs/{{ inventory_hostname }}.key
+
+- name: setup node and get certificates signed (direct)
   command: |
     icinga2 node setup \
     --zone {{ inventory_hostname }} \
     --endpoint {{ icinga2_client_monitoring_parents[0] }} \
     --parent_host {{ icinga2_client_monitoring_parents[0] }} \
     --parent_zone {{ icinga2_client_parent_zone }} \
-    --ticket {{ icinga2_client_register_ticket.json.results.0.ticket }} \
     --trustedcert /var/lib/icinga2/certs/icinga2_master_ca.crt \
     --accept-config --accept-commands
   args:
     creates: /var/lib/icinga2/certs/ca.crt
-  when: not icinga2_client_register_ticket_generated.stat.exists
+  when: not icinga2_client_register_ticket_generated.stat.exists and icinga2_client_master_reachable_host is not defined
+
+- name: setup node and get certificates signed (indirect)
+  command: |
+    icinga2 node setup \
+    --zone {{ inventory_hostname }} \
+    --endpoint {{ icinga2_client_monitoring_parents[0] }} \
+    --trustedcert /var/lib/icinga2/certs/icinga2_master_ca.crt \
+    --accept-config --accept-commands
+  args:
+    creates: /var/lib/icinga2/certs/ca.crt
+  when: not icinga2_client_register_ticket_generated.stat.exists and icinga2_client_master_reachable_host is defined
+
+- name: restart icinga2
+  service:
+    name: icinga2
+    state: restarted
+
+- name: get the certificate fingerprint
+  shell: >
+    set -o pipefail;
+    openssl x509
+    -in /var/lib/icinga2/certs/{{ inventory_hostname }}.crt
+    -fingerprint -sha256 -noout | cut -d '=' -f 2 | sed 's/://g' | tr A-Z a-z
+  register: icinga2_client_register_certfinger
+  when: icinga2_client_master_reachable_host is defined and icinga2_client_register_certs_created.changed
+
+- name: sign certificate request on master
+  command: >
+    icinga2 ca sign {{ icinga2_client_register_certfinger['stdout'] }}
+  delegate_to: "vm-adsy-monitoring-prod-westeurope-master-1.adfinis-sygroup.ch"
+  when: icinga2_client_master_reachable_host is defined and icinga2_client_register_certs_created.changed
