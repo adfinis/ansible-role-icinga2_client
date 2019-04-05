@@ -115,10 +115,10 @@
     -in /var/lib/icinga2/certs/{{ inventory_hostname }}.crt
     -fingerprint -sha256 -noout | cut -d '=' -f 2 | sed 's/://g' | tr A-Z a-z
   register: icinga2_client_register_certfinger
-  when: icinga2_client_master_reachable_host is defined and icinga2_client_register_certs_created.changed
+  when: icinga2_client_master_reachable_host is defined and icinga2_client_register_certs_created.changed # noqa 503
 
 - name: sign certificate request on master
   command: >
     icinga2 ca sign {{ icinga2_client_register_certfinger['stdout'] }}
   delegate_to: "vm-adsy-monitoring-prod-westeurope-master-1.adfinis-sygroup.ch"
-  when: icinga2_client_master_reachable_host is defined and icinga2_client_register_certs_created.changed
+  when: icinga2_client_master_reachable_host is defined and icinga2_client_register_certs_created.changed # noqa 503
