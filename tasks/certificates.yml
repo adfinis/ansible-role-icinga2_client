@@ -86,6 +86,7 @@
     --endpoint {{ icinga2_client_monitoring_parents[0] }} \
     --parent_host {{ icinga2_client_monitoring_parents[0] }} \
     --parent_zone {{ icinga2_client_parent_zone }} \
+    --ticket {{ icinga2_client_register_ticket.json.results.0.ticket }} \
     --trustedcert /var/lib/icinga2/certs/icinga2_master_ca.crt \
     --accept-config --accept-commands
   args:
