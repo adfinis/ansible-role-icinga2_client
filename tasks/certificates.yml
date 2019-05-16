@@ -19,24 +19,8 @@
       Accept: 'application/json'
     validate_certs: no
   register: icinga2_client_register_ticket
-  when: icinga2_client_master_reachable_host is not defined and not icinga2_client_register_ticket_generated.stat.exists
-
-- name: get ticket from master (delegate)
-  uri:
-    url: '{{ icinga2_client_api_url }}/v1/actions/generate-ticket'
-    method: POST
-    user: '{{ icinga2_client_api_user }}'
-    password: '{{ icinga2_client_api_pass }}'
-    body: '{ "cn": "{{ inventory_hostname }}"}'
-    force_basic_auth: yes
-    status_code: 200
-    body_format: 'json'
-    headers:
-      Accept: 'application/json'
-    validate_certs: no
-  register: icinga2_client_register_ticket
-  when: icinga2_client_master_reachable_host is defined and not icinga2_client_register_ticket_generated.stat.exists
-  delegate_to: '{{ icinga2_client_master_reachable_host }}'
+  when: not icinga2_client_register_ticket_generated.stat.exists
+  delegate_to: '{{ icinga2_client_master_reachable_host | default(omit) }}'
 
 # - name: ticket and fqdn
 #   debug:
@@ -86,6 +70,7 @@
     --endpoint {{ icinga2_client_monitoring_parents[0] }} \
     --parent_host {{ icinga2_client_monitoring_parents[0] }} \
     --parent_zone {{ icinga2_client_parent_zone }} \
+    --ticket {{ icinga2_client_register_ticket.json.results.0.ticket }} \
     --trustedcert /var/lib/icinga2/certs/icinga2_master_ca.crt \
     --accept-config --accept-commands
   args:
