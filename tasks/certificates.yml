@@ -20,7 +20,7 @@
     validate_certs: no
   register: icinga2_client_register_ticket
   when: not icinga2_client_register_ticket_generated.stat.exists
-  delegate_to: '{{ icinga2_client_master_reachable_host | default(omit)}}'
+  delegate_to: '{{ icinga2_client_master_reachable_host | default(omit) }}'
 
 # - name: ticket and fqdn
 #   debug:
