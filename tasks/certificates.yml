@@ -22,6 +22,13 @@
   when: not icinga2_client_register_ticket_generated.stat.exists
   delegate_to: '{{ icinga2_client_master_reachable_host | default(omit) }}'
 
+- name: create cert folder for icinga2
+  file:
+    path: /var/lib/icinga2/certs
+    state: directory
+    owner: '{{ icinga2_client_file_owner }}'
+    group: '{{ icinga2_client_file_group }}'
+
 # - name: ticket and fqdn
 #   debug:
 #     msg: "{{ icinga2_client_register_ticket.json.results.0.ticket }}: is for {{ inventory_hostname }}"
