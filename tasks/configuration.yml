@@ -50,8 +50,8 @@
   template:
     src: templates/etc/icinga2/features-available/api.conf.j2
     dest: /etc/icinga2/features-available/api.conf
-    owner: icinga
-    group: icinga
+    owner: '{{ icinga2_client_file_owner }}'
+    group: '{{ icinga2_client_file_group }}'
     mode: 0640
     seuser: system_u
     serole: object_r
