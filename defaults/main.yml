@@ -18,13 +18,17 @@ icinga2_client_api_user: "root"
 # The API password of the icinga2 master
 icinga2_client_api_pass: ""
 
-# If the client can't reach the config master directly, set this to the 
+# If the client can't reach the config master directly, set this to the
 # next host which can reach the config master. unset by default
 # icinga2_client_master_reachable_host: ''
 
 # Packages which should be installed additionally for custom check commands
 # Defaults to an empty list
 icinga2_client_custom_check_packages: []
+
+# Global Zones to be added to zones.conf
+icinga2_client_global_zones:
+  - global-templates
 
 # Specify if the host config & zone are managed by director
 # and therefore should not be written by the master playbook
