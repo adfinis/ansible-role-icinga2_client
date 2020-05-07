@@ -25,3 +25,7 @@ icinga2_client_api_pass: ""
 # Packages which should be installed additionally for custom check commands
 # Defaults to an empty list
 icinga2_client_custom_check_packages: []
+
+# Specify if the host config & zone are managed by director
+# and therefore should not be written by the master playbook
+icinga2_client_director_managed: false
