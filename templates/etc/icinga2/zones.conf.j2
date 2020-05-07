@@ -3,10 +3,12 @@
  *  Configuration from Icinga2 version r2.10.2-1
  */
 
-object Zone "global-templates" {
+{% for item in icinga2_client_global_zones %}
+object Zone "{{ item }}" {
   global = true
 }
 
+{% endfor %}
 {# each parent host gets an endpoint definition#}
 {% for item in icinga2_client_monitoring_parents %}
 object Endpoint "{{ item }}" {
