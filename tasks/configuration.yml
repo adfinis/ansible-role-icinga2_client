@@ -62,7 +62,7 @@
   file:
     src: /etc/icinga2/features-available/api.conf
     dest: /etc/icinga2/features-enabled/api.conf
-    mode: 0777
+    mode: 0640
     state: link
 
 - name: disable the notification feature
