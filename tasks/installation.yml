@@ -1,12 +1,12 @@
 ---
 
-- name: install custom check packages (non Debian)
+- name: install custom check packages (non debian)
   package:
     name: "{{ icinga2_client_custom_check_packages }}"
     state: present
   when: ansible_os_family != 'Debian'
 
-- name: install custom check packages (Debian)
+- name: install custom check packages (debian)
   apt:
     name: "{{ icinga2_client_custom_check_packages }}"
     state: present
