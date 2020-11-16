@@ -26,6 +26,10 @@ icinga2_client_api_pass: ""
 # Defaults to an empty list
 icinga2_client_custom_check_packages: []
 
+# List of repos to enable when installing custom check packages (rhel only)
+# Defaults to an empty list
+icinga2_client_custom_check_packages_enable_repo: []
+
 # Global Zones to be added to zones.conf
 icinga2_client_global_zones:
   - global-templates
