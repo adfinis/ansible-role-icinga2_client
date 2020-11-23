@@ -41,3 +41,8 @@ icinga2_client_director_managed: false
 # Specify whether the client should actively try to connect (false)
 # to its parent(s) or not (true)
 icinga2_client_passive: false
+
+## uncomment to override the master signing host 'vm-adsy-monitoring-prod-westeurope-master-1.adfinis-sygroup.ch'
+# icinga2_client_csr_signing_master: monitoring-master1.example.com
+
+...
