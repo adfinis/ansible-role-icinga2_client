@@ -52,7 +52,7 @@
   command: cat /var/lib/icinga2/certs/ca.crt
   register: icinga2_client_register_ca
   when: icinga2_client_master_reachable_host is defined and not icinga2_client_register_ca_created.stat.exists
-  delegate_to: '{{ icinga2_client_master_reachable_host }}'
+  delegate_to: '{{ icinga2_client_csr_signing_master }}'
 
 - name: save ca from icinga2 master (delegate)
   copy:
@@ -114,5 +114,5 @@
 - name: sign certificate request on master
   command: >
     icinga2 ca sign {{ icinga2_client_register_certfinger['stdout'] }}
-  delegate_to: '{{ icinga2_client_master_reachable_host }}'
+  delegate_to: '{{ icinga2_client_csr_signing_master }}'
   when: icinga2_client_master_reachable_host is defined and icinga2_client_register_certs_created.changed # noqa 503
