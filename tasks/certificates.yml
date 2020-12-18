@@ -81,6 +81,7 @@
     --parent_zone {{ icinga2_client_parent_zone }} \
     --ticket {{ icinga2_client_register_ticket.json.results.0.ticket }} \
     --trustedcert /var/lib/icinga2/certs/icinga2_master_ca.crt \
+    --cn {{ inventory_hostname }}
     --accept-config --accept-commands
   args:
     creates: /var/lib/icinga2/certs/ca.crt
