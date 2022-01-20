@@ -12,9 +12,9 @@ object Zone "{{ item }}" {
 {# each parent host gets an endpoint definition#}
 {% for item in icinga2_client_monitoring_parents %}
 object Endpoint "{{ item }}" {
-  {% if not icinga2_client_passive %}
+{% if not icinga2_client_passive %}
   host = "{{ item }}"
-  {% endif %}
+{% endif %}
 }
 {% endfor %}
 
