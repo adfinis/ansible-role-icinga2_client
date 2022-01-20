@@ -1,121 +1,50 @@
 ---
 
-- name: check if rules file exists
-  stat:
-    path: /var/lib/icinga2/certs/ticket
-  register: icinga2_client_register_ticket_generated
-
-- name: get ticket from master (direct)
-  uri:
-    url: '{{ icinga2_client_api_url }}/v1/actions/generate-ticket'
-    method: POST
-    user: '{{ icinga2_client_api_user }}'
-    password: '{{ icinga2_client_api_pass }}'
-    body: '{ "cn": "{{ inventory_hostname }}"}'
-    force_basic_auth: yes
-    status_code: 200
-    body_format: 'json'
-    headers:
-      Accept: 'application/json'
-    validate_certs: no
-  register: icinga2_client_register_ticket
-  when: not icinga2_client_register_ticket_generated.stat.exists
-  delegate_to: '{{ icinga2_client_master_reachable_host | default(omit) }}'
-
 - name: create cert folder for icinga2
   file:
     path: /var/lib/icinga2/certs
     state: directory
     mode: 0750
-    owner: '{{ icinga2_client_file_owner }}'
-    group: '{{ icinga2_client_file_group }}'
+    owner: "{{ icinga2_client_file_owner }}"
+    group: "{{ icinga2_client_file_group }}"
 
-# - name: ticket and fqdn
-#   debug:
-#     msg: "{{ icinga2_client_register_ticket.json.results.0.ticket }}: is for {{ inventory_hostname }}"
+- name: get parent zone certificate
+  command:
+    cmd: >
+      icinga2 pki save-cert
+      --host {{ icinga2_client_monitoring_parents[0] }}
+      --trustedcert /var/lib/icinga2/certs/{{ icinga2_client_monitoring_parents[0] }}.crt
+    creates: /var/lib/icinga2/certs/{{ icinga2_client_monitoring_parents[0] }}.crt
 
-- name: get ca from icinga2 masters (direct)
-  command: |
-    icinga2 pki save-cert --host {{ icinga2_client_monitoring_parents[0] }} \
-    --trustedcert /var/lib/icinga2/certs/icinga2_master_ca.crt
-  args:
-    creates: /var/lib/icinga2/certs/icinga2_master_ca.crt
-  when: icinga2_client_master_reachable_host is not defined
+- name: create client certificate
+  command:
+    cmd: >
+      icinga2 node setup
+      --zone {{ inventory_hostname }}
+      --endpoint {{ icinga2_client_monitoring_parents[0] }}
+      --parent_host {{ icinga2_client_monitoring_parents[0] }}
+      --parent_zone {{ icinga2_client_parent_zone }}
+      --cn {{ inventory_hostname }}
+      --trustedcert /var/lib/icinga2/certs/{{ icinga2_client_monitoring_parents[0] }}.crt
+      --accept-config
+      --accept-commands
+    creates: /var/lib/icinga2/certs/{{ inventory_hostname }}.crt
+  register: icinga2_client_register_create_client_cert
+  notify: "icinga2_client reload icinga2"
 
-- name: check if ca file exists
-  stat:
-    path: /var/lib/icinga2/certs/ca.crt
-  register: icinga2_client_register_ca_created
-  when: icinga2_client_master_reachable_host is defined
-
-- name: get ca from icinga2 masters (delegate)
-  command: cat /var/lib/icinga2/certs/ca.crt
-  register: icinga2_client_register_ca
-  when: icinga2_client_master_reachable_host is defined and not icinga2_client_register_ca_created.stat.exists
-  delegate_to: '{{ icinga2_client_csr_signing_master }}'
-
-- name: save ca from icinga2 master (delegate)
-  copy:
-    content: '{{ icinga2_client_register_ca["stdout"] }}'
-    dest: /var/lib/icinga2/certs/ca.crt
-    mode: 0644
-  when: icinga2_client_master_reachable_host is defined and not icinga2_client_register_ca_created.stat.exists
-
-- name: create new certs
+- name: get client certificate fingerprint
   command: >
-    icinga2 pki new-cert
-    --cn {{ inventory_hostname }}
-    --key /var/lib/icinga2/certs/{{ inventory_hostname }}.key
-    --cert /var/lib/icinga2/certs/{{ inventory_hostname }}.crt
-  register: icinga2_client_register_certs_created
-  when: icinga2_client_master_reachable_host is defined
-  args:
-    creates: /var/lib/icinga2/certs/{{ inventory_hostname }}.key
-
-- name: setup node and get certificates signed (direct)
-  command: |
-    icinga2 node setup \
-    --zone {{ inventory_hostname }} \
-    --endpoint {{ icinga2_client_monitoring_parents[0] }} \
-    --parent_host {{ icinga2_client_monitoring_parents[0] }} \
-    --parent_zone {{ icinga2_client_parent_zone }} \
-    --ticket {{ icinga2_client_register_ticket.json.results.0.ticket }} \
-    --trustedcert /var/lib/icinga2/certs/icinga2_master_ca.crt \
-    --cn {{ inventory_hostname }}
-    --accept-config --accept-commands
-  args:
-    creates: /var/lib/icinga2/certs/ca.crt
-  when: not icinga2_client_register_ticket_generated.stat.exists and icinga2_client_master_reachable_host is not defined
-
-- name: setup node and get certificates signed (indirect)
-  command: |
-    icinga2 node setup \
-    --zone {{ inventory_hostname }} \
-    --endpoint {{ icinga2_client_monitoring_parents[0] }} \
-    --trustedcert /var/lib/icinga2/certs/icinga2_master_ca.crt \
-    --accept-config --accept-commands
-  args:
-    creates: /var/lib/icinga2/certs/ca.crt
-  when: not icinga2_client_register_ticket_generated.stat.exists and icinga2_client_master_reachable_host is defined
-
-- name: restart icinga2
-  service:
-    name: icinga2
-    state: restarted
-
-- name: get the certificate fingerprint
-  shell: >
-    set -o pipefail;
     openssl x509
     -in /var/lib/icinga2/certs/{{ inventory_hostname }}.crt
-    -fingerprint -sha256 -noout | cut -d '=' -f 2 | sed 's/://g' | tr A-Z a-z
-  args:
-    executable: /bin/bash
-  register: icinga2_client_register_certfinger
-  when: icinga2_client_master_reachable_host is defined and icinga2_client_register_certs_created.changed # noqa 503
+    -fingerprint
+    -sha256
+    -noout
+  register: icinga2_client_register_cert_fingerprint
+  when: icinga2_client_register_create_client_cert.changed
 
-- name: sign certificate request on master
+- name: sign client certificate on signing master
   command: >
-    icinga2 ca sign {{ icinga2_client_register_certfinger['stdout'] }}
-  delegate_to: '{{ icinga2_client_csr_signing_master }}'
-  when: icinga2_client_master_reachable_host is defined and icinga2_client_register_certs_created.changed # noqa 503
+    icinga2 ca sign
+    {{ icinga2_client_register_cert_fingerprint.stdout.split("=")[1] | replace(":", "")  | lower }}
+  when: icinga2_client_register_create_client_cert.changed and not ansible_check_mode
+  delegate_to: "{{ icinga2_client_csr_signing_master }}"
