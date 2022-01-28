@@ -40,7 +40,7 @@
     -sha256
     -noout
   register: icinga2_client_register_cert_fingerprint
-  when: icinga2_client_register_create_client_cert.changed
+  when: icinga2_client_register_create_client_cert.changed and not ansible_check_mode
 
 - name: sign client certificate on signing master
   command: >
