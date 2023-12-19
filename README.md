@@ -1,11 +1,11 @@
 ROLE ICINGA2\_CLIENT
 ====================
 
-[![image](https://img.shields.io/github/license/adfinis/ansible-role-icinga2_client.svg?style=flat-square)](https://github.com/adfinis-sygroup/ansible-role-icinga2_client/blob/master/LICENSE)
+[![image](https://img.shields.io/github/license/adfinis/ansible-role-icinga2_client.svg?style=flat-square)](https://github.com/adfinis/ansible-role-icinga2_client/blob/master/LICENSE)
 
-[![image](https://img.shields.io/travis/adfinis/ansible-role-icinga2_client.svg?style=flat-square)](https://travis-ci.org/adfinis-sygroup/ansible-role-icinga2_client)
+[![image](https://img.shields.io/github/actions/workflow/status/adfinis/ansible-role-icinga2_client/ansible-ci.yml?style=flat-square)](https://github.com/adfinis/ansible-role-icinga2_client/actions)
 
-[![image](https://img.shields.io/badge/galaxy-adfinis.icinga2_client-660198.svg?style=flat-square)](https://galaxy.ansible.com/adfinis-sygroup/icinga2_client)
+[![image](https://img.shields.io/badge/galaxy-adfinis.icinga2_client-660198.svg?style=flat-square)](https://galaxy.ansible.com/adfinis/icinga2_client)
 
 This role is used to configure the icinga2 client and request
 certificates from the icinga2 master.
