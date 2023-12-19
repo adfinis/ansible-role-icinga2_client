@@ -1,25 +1,27 @@
 ---
-
-- name: include os specific vars
-  include_vars: '{{ item }}'
+- name: Include os specific vars
+  ansible.builtin.include_vars: "{{ item }}"
   with_first_found:
-    - '{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml'
-    - '{{ ansible_os_family }}.yml'
+    - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_os_family }}.yml"
   tags:
-    - 'role::icinga2_client'
-    - 'role::icinga2_client:config'
+    - role::icinga2_client
+    - role::icinga2_client:config
 
-- import_tasks: installation.yml
+- name: Include installation tasks
+  ansible.builtin.import_tasks: installation.yml
   tags:
-    - 'role::icinga2_client'
-    - 'role::icinga2_client:install'
+    - role::icinga2_client
+    - role::icinga2_client:install
 
-- import_tasks: certificates.yml
+- name: Include certificates tasks
+  ansible.builtin.import_tasks: certificates.yml
   tags:
-    - 'role::icinga2_client'
-    - 'role::icinga2_client:cert'
+    - role::icinga2_client
+    - role::icinga2_client:cert
 
-- import_tasks: configuration.yml
+- name: Include configuration tasks
+  ansible.builtin.import_tasks: configuration.yml
   tags:
-    - 'role::icinga2_client'
-    - 'role::icinga2_client:config'
+    - role::icinga2_client
+    - role::icinga2_client:config

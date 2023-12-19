@@ -1,11 +1,11 @@
 ---
 name: CI - Linting
 
-on:
+"on":
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   # This workflow contains a single job called "build"
@@ -20,7 +20,7 @@ jobs:
       # Checkout Adfinis lint-rules
       - uses: actions/checkout@v2
         with:
-          repository: adfinis-sygroup/ansible-lint-rules
+          repository: adfinis/ansible-lint-rules
           path: lint-rules
 
       - name: ansible-lint

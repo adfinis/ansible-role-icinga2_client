@@ -1,23 +1,22 @@
 ---
-
-- name: install custom check packages (generic)
-  package:
+- name: Install custom check packages (generic)
+  ansible.builtin.package:
     name: "{{ icinga2_client_custom_check_packages }}"
     state: present
   when:
     - ansible_os_family != 'Debian'
     - ansible_os_family != 'RedHat'
 
-- name: install custom check packages (redhat)
-  yum:
-    name: '{{ icinga2_client_custom_check_packages }}'
-    enablerepo: '{{ icinga2_client_custom_check_packages_enable_repo }}'
+- name: Install custom check packages (redhat)
+  ansible.builtin.yum:
+    name: "{{ icinga2_client_custom_check_packages }}"
+    enablerepo: "{{ icinga2_client_custom_check_packages_enable_repo }}"
     state: present
   when: ansible_os_family == 'RedHat'
 
-- name: install custom check packages (debian)
-  apt:
+- name: Install custom check packages (debian)
+  ansible.builtin.apt:
     name: "{{ icinga2_client_custom_check_packages }}"
     state: present
-    install_recommends: no
+    install_recommends: false
   when: ansible_os_family == 'Debian'
