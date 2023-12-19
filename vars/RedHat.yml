@@ -7,10 +7,10 @@ icinga2_client_file_owner: icinga
 icinga2_client_file_group: icinga
 
 # The nagios plugins dir
-icinga2_client_plugin_dir: '/usr/lib64/nagios/plugins'
+icinga2_client_plugin_dir: /usr/lib64/nagios/plugins
 
 # The manubulon plugin dir
-icinga2_client_manubulon_plugin_dir: '/usr/lib64/nagios/plugins'
+icinga2_client_manubulon_plugin_dir: /usr/lib64/nagios/plugins
 
 # The contrib plugin dir
-icinga2_client_contrib_plugin_dir: '/usr/lib64/nagios/plugins'
+icinga2_client_contrib_plugin_dir: /usr/lib64/nagios/plugins

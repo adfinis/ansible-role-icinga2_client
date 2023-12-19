@@ -1,15 +1,16 @@
 ---
 
 dependencies:
-  - name: "adfinis.icinga2_agent"
+  - name: adfinis.icinga2_agent
 
 galaxy_info:
-  role_name: 'icinga2_client'
-  author: 'Adfinis AG'
-  description: 'This role is used to configure a icinga2 client'
-  company: 'Adfinis AG'
-  license: 'GNU General Public License v3'
-  min_ansible_version: '2.0.0'
+  role_name: icinga2_client
+  namespace: adfinis
+  author: Adfinis AG
+  description: This role is used to configure a icinga2 client
+  company: Adfinis AG
+  license: GNU General Public License v3
+  min_ansible_version: 2.0.0
   platforms:
     - name: Debian
       versions:
@@ -27,11 +28,11 @@ galaxy_info:
         - jammy
     - name: EL
       versions:
-        - 6
-        - 7
-        - 8
+        - "6"
+        - "7"
+        - "9"
   galaxy_tags:
-    - "icinga2"
-    - "client"
-    - "monitoring"
-    - "certificates"
+    - icinga2
+    - client
+    - monitoring
+    - certificates
