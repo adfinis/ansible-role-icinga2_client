@@ -8,43 +8,60 @@
     group: "{{ icinga2_client_file_group }}"
 
 - name: Get parent zone certificate
-  ansible.legacy.command:
-    cmd: >
-      icinga2 pki save-cert
-      --host {{ icinga2_client_monitoring_parents[0] }}
-      --trustedcert /var/lib/icinga2/certs/{{ icinga2_client_monitoring_parents[0] }}.crt
+  ansible.builtin.command:
+    argv:
+      - icinga2
+      - pki
+      - save-cert
+      - --host
+      - "{{ icinga2_client_monitoring_parents[0] }}"
+      - --trustedcert
+      - /var/lib/icinga2/certs/{{ icinga2_client_monitoring_parents[0] }}.crt
     creates: /var/lib/icinga2/certs/{{ icinga2_client_monitoring_parents[0] }}.crt
 
 - name: Create client certificate
-  ansible.legacy.command:
-    cmd: >
-      icinga2 node setup
-      --zone {{ inventory_hostname }}
-      --endpoint {{ icinga2_client_monitoring_parents[0] }}
-      --parent_host {{ icinga2_client_monitoring_parents[0] }}
-      --parent_zone {{ icinga2_client_parent_zone }}
-      --cn {{ inventory_hostname }}
-      --trustedcert /var/lib/icinga2/certs/{{ icinga2_client_monitoring_parents[0] }}.crt
-      --accept-config
-      --accept-commands
+  ansible.builtin.command:
+    argv:
+      - icinga2
+      - node
+      - setup
+      - --zone
+      - "{{ inventory_hostname }}"
+      - --endpoint
+      - "{{ icinga2_client_monitoring_parents[0] }}"
+      - --parent_host
+      - "{{ icinga2_client_monitoring_parents[0] }}"
+      - --parent_zone
+      - "{{ icinga2_client_parent_zone }}"
+      - --cn
+      - "{{ inventory_hostname }}"
+      - --trustedcert
+      - /var/lib/icinga2/certs/{{ icinga2_client_monitoring_parents[0] }}.crt
+      - --accept-config
+      - --accept-commands
     creates: /var/lib/icinga2/certs/{{ inventory_hostname }}.crt
   register: icinga2_client_register_create_client_cert
   notify: icinga2_client reload icinga2
 
 - name: Get client certificate fingerprint # noqa: no-changed-when
-  ansible.legacy.command:
-    cmd: >
-      openssl x509
-      -in /var/lib/icinga2/certs/{{ inventory_hostname }}.crt
-      -fingerprint
-      -sha256
-      -noout
+  ansible.builtin.command:
+    argv:
+      - openssl
+      - x509
+      - -in
+      - /var/lib/icinga2/certs/{{ inventory_hostname }}.crt
+      - -fingerprint
+      - -sha256
+      - -noout
   register: icinga2_client_register_cert_fingerprint
   when: icinga2_client_register_create_client_cert.changed and not ansible_check_mode
 
 - name: Sign client certificate on signing master # noqa: no-changed-when
-  ansible.legacy.command:
-    cmd: >
-      icinga2 ca sign {{ icinga2_client_register_cert_fingerprint.stdout.split("=")[1] | replace(":", "") | lower }}
+  ansible.builtin.command:
+    argv:
+      - icinga2
+      - ca
+      - sign
+      - "{{ icinga2_client_register_cert_fingerprint.stdout.split('=')[1] | replace(':', '') | lower }}"
   when: icinga2_client_register_create_client_cert.changed and not ansible_check_mode
   delegate_to: "{{ icinga2_client_csr_signing_master }}"
