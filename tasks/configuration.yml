@@ -17,7 +17,7 @@
     serole: object_r
     setype: etc_t
     selevel: s0
-  notify: icinga2_client reload icinga2
+  notify: Icinga2_client reload icinga2
 
 - name: Install icinga2 constants configuration
   ansible.builtin.template:
@@ -30,7 +30,7 @@
     serole: object_r
     setype: etc_t
     selevel: s0
-  notify: icinga2_client reload icinga2
+  notify: Icinga2_client reload icinga2
 
 - name: Install icinga2 zones configuration
   ansible.builtin.template:
@@ -43,7 +43,7 @@
     serole: object_r
     setype: etc_t
     selevel: s0
-  notify: icinga2_client reload icinga2
+  notify: Icinga2_client reload icinga2
 
 - name: Configure icinga2 api feature
   ansible.builtin.template:
@@ -68,4 +68,4 @@
   ansible.builtin.file:
     name: /etc/icinga2/features-enabled/notification.conf
     state: absent
-  notify: icinga2_client reload icinga2
+  notify: Icinga2_client reload icinga2
