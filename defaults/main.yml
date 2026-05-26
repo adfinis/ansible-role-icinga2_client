@@ -9,6 +9,9 @@ icinga2_client_monitoring_parents:
 # The default icinga2 parent zone
 icinga2_client_parent_zone: monitoring-master
 
+# Zones of child satellites
+icinga2_client_child_satellites: []
+
 # The signing master where the signing ticket creation will be delegated to.
 icinga2_client_csr_signing_master: "{{ icinga2_client_monitoring_parents[0] }}"
 
