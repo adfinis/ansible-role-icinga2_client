@@ -31,3 +31,15 @@ object Zone "{{ inventory_hostname }}" {
   endpoints = [ "{{ inventory_hostname }}" ]
   parent = "{{ icinga2_client_parent_zone }}"
 }
+{# Each child satellite gets and endpoint definition #}
+{% for item in icinga2_client_child_satellites %}
+
+object Endpoint "{{ item }}" {
+  host = "{{ item }}"
+}
+
+object Zone "{{ item }}" {
+  endpoints = [ "{{ item }}" ]
+  parent = "{{ inventory_hostname }}"
+}
+{% endfor %}
