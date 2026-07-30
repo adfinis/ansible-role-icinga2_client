@@ -8,7 +8,7 @@
     - ansible_os_family != 'RedHat'
 
 - name: Install custom check packages (redhat)
-  ansible.builtin.yum:
+  ansible.builtin.dnf:
     name: "{{ icinga2_client_custom_check_packages }}"
     enablerepo: "{{ icinga2_client_custom_check_packages_enable_repo }}"
     state: present
