@@ -15,6 +15,35 @@ icinga2_client_child_satellites: []
 # The signing master where the signing ticket creation will be delegated to.
 icinga2_client_csr_signing_master: "{{ icinga2_client_monitoring_parents[0] }}"
 
+# How the client certificate gets signed:
+#   "delegate" (legacy) -> on-demand CSR signing, runs `icinga2 ca sign` on the
+#                          signing master via delegate_to
+#   "ticket"            -> CSR auto-signing with a ticket fetched from the
+#                          master REST API
+icinga2_client_signing_method: delegate
+
+# REST API endpoint of the CA master used to generate signing tickets
+icinga2_client_ticket_api_url: "https://{{ icinga2_client_csr_signing_master }}:5665"
+
+# ApiUser on the CA master with the "actions/generate-ticket" permission.
+icinga2_client_ticket_api_user: ticket-service
+# Password of the ticket ApiUser.
+icinga2_client_ticket_api_password: ""
+
+# TLS validation of the master API cert. The API cert is signed by the Icinga
+# CA, which the controller usually does not trust; either set this to false,
+# or keep it true and point icinga2_client_ticket_api_ca_path at a copy of the
+# Icinga CA certificate (ca.crt).
+icinga2_client_ticket_api_validate_certs: true
+# icinga2_client_ticket_api_ca_path: /etc/ansible/icinga-ca.crt
+
+# Where the ticket API call will be deletegated to.
+icinga2_client_ticket_api_delegate: localhost
+
+# Set to false to disable no_log on all tasks of this role.
+# Warning: this exposes credentials.
+icinga2_client_no_log: true
+
 # Packages which should be installed additionally for custom check commands
 # Defaults to an empty list
 icinga2_client_custom_check_packages: []

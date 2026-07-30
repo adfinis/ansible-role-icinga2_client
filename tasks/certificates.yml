@@ -1,4 +1,9 @@
 ---
+- name: Verify signing method
+  ansible.builtin.assert:
+    that: icinga2_client_signing_method in ['delegate', 'ticket']
+    fail_msg: icinga2_client_signing_method must be 'delegate' or 'ticket'
+
 - name: Create cert folder for icinga2
   ansible.builtin.file:
     path: /var/lib/icinga2/certs
@@ -19,9 +24,51 @@
       - /var/lib/icinga2/certs/{{ icinga2_client_monitoring_parents[0] }}.crt
     creates: /var/lib/icinga2/certs/{{ icinga2_client_monitoring_parents[0] }}.crt
 
+- name: Check for existing client certificate
+  ansible.builtin.stat:
+    path: /var/lib/icinga2/certs/{{ inventory_hostname }}.crt
+  register: icinga2_client_register_client_cert_stat
+
+- name: Fetch signing ticket from the master API
+  ansible.builtin.uri:
+    url: "{{ icinga2_client_ticket_api_url }}/v1/actions/generate-ticket"
+    method: POST
+    url_username: "{{ icinga2_client_ticket_api_user }}"
+    url_password: "{{ icinga2_client_ticket_api_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ icinga2_client_ticket_api_validate_certs | bool }}"
+    ca_path: "{{ icinga2_client_ticket_api_ca_path | default(omit) }}"
+    headers:
+      Accept: application/json
+    body_format: json
+    body:
+      cn: "{{ inventory_hostname }}"
+    return_content: true
+  register: icinga2_client_register_ticket_response
+  delegate_to: "{{ icinga2_client_ticket_api_delegate }}"
+  # Also set as variable: an ansible_become var from inventory would
+  # otherwise override the become keyword
+  become: false
+  vars:
+    ansible_become: false
+  no_log: "{{ icinga2_client_no_log | bool }}"
+  when:
+    - icinga2_client_signing_method == 'ticket'
+    - not icinga2_client_register_client_cert_stat.stat.exists
+    - not ansible_check_mode
+
+- name: Extract signing ticket from API response
+  ansible.builtin.set_fact:
+    icinga2_client_ticket: "{{ icinga2_client_register_ticket_response.json.results[0].ticket }}"
+  no_log: "{{ icinga2_client_no_log | bool }}"
+  when: icinga2_client_register_ticket_response is not skipped
+
 - name: Create client certificate
   ansible.builtin.command:
-    argv:
+    argv: "{{ icinga2_client_node_setup_argv + icinga2_client_node_setup_ticket_argv }}"
+    creates: /var/lib/icinga2/certs/{{ inventory_hostname }}.crt
+  vars:
+    icinga2_client_node_setup_argv:
       - icinga2
       - node
       - setup
@@ -39,8 +86,10 @@
       - /var/lib/icinga2/certs/{{ icinga2_client_monitoring_parents[0] }}.crt
       - --accept-config
       - --accept-commands
-    creates: /var/lib/icinga2/certs/{{ inventory_hostname }}.crt
+    icinga2_client_node_setup_ticket_argv: "{{ ['--ticket', icinga2_client_ticket] if icinga2_client_ticket is defined else [] }}"
   register: icinga2_client_register_create_client_cert
+  # In ticket mode the argv contains the ticket, which must not be logged
+  no_log: "{{ icinga2_client_signing_method == 'ticket' and icinga2_client_no_log | bool }}"
   notify: Icinga2_client reload icinga2
 
 - name: Get client certificate fingerprint # noqa: no-changed-when
@@ -54,7 +103,9 @@
       - -sha256
       - -noout
   register: icinga2_client_register_cert_fingerprint
-  when: icinga2_client_register_create_client_cert.changed and not ansible_check_mode
+  when:
+    - icinga2_client_signing_method == 'delegate'
+    - icinga2_client_register_create_client_cert.changed and not ansible_check_mode
 
 - name: Sign client certificate on signing master # noqa: no-changed-when
   ansible.builtin.command:
@@ -63,7 +114,9 @@
       - ca
       - sign
       - "{{ icinga2_client_register_cert_fingerprint.stdout.split('=')[1] | replace(':', '') | lower }}"
-  when: icinga2_client_register_create_client_cert.changed and not ansible_check_mode
+  when:
+    - icinga2_client_signing_method == 'delegate'
+    - icinga2_client_register_create_client_cert.changed and not ansible_check_mode
   delegate_to: "{{ icinga2_client_csr_signing_master }}"
   tags:
     - role::icinga2_client:cert:signing
