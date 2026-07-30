@@ -65,3 +65,5 @@
       - "{{ icinga2_client_register_cert_fingerprint.stdout.split('=')[1] | replace(':', '') | lower }}"
   when: icinga2_client_register_create_client_cert.changed and not ansible_check_mode
   delegate_to: "{{ icinga2_client_csr_signing_master }}"
+  tags:
+    - role::icinga2_client:cert:signging
