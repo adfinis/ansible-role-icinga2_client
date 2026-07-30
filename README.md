@@ -47,6 +47,10 @@ icinga2_client_ticket_api_validate_certs: true
 
 # Where the ticket API call will be deletegated to.
 icinga2_client_ticket_api_delegate: localhost
+
+# Set to false to disable no_log on all tasks of this role.
+# Warning: this exposes credentials.
+icinga2_client_no_log: true
 ```
 
 Ticket-based enrollment

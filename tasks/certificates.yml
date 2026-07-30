@@ -46,8 +46,12 @@
     return_content: true
   register: icinga2_client_register_ticket_response
   delegate_to: "{{ icinga2_client_ticket_api_delegate }}"
+  # Also set as variable: an ansible_become var from inventory would
+  # otherwise override the become keyword
   become: false
-  no_log: true
+  vars:
+    ansible_become: false
+  no_log: "{{ icinga2_client_no_log | bool }}"
   when:
     - icinga2_client_signing_method == 'ticket'
     - not icinga2_client_register_client_cert_stat.stat.exists
@@ -56,7 +60,7 @@
 - name: Extract signing ticket from API response
   ansible.builtin.set_fact:
     icinga2_client_ticket: "{{ icinga2_client_register_ticket_response.json.results[0].ticket }}"
-  no_log: true
+  no_log: "{{ icinga2_client_no_log | bool }}"
   when: icinga2_client_register_ticket_response is not skipped
 
 - name: Create client certificate
@@ -85,7 +89,7 @@
     icinga2_client_node_setup_ticket_argv: "{{ ['--ticket', icinga2_client_ticket] if icinga2_client_ticket is defined else [] }}"
   register: icinga2_client_register_create_client_cert
   # In ticket mode the argv contains the ticket, which must not be logged
-  no_log: "{{ icinga2_client_signing_method == 'ticket' }}"
+  no_log: "{{ icinga2_client_signing_method == 'ticket' and icinga2_client_no_log | bool }}"
   notify: Icinga2_client reload icinga2
 
 - name: Get client certificate fingerprint # noqa: no-changed-when
