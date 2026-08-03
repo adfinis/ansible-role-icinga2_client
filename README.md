@@ -1,6 +1,10 @@
 ROLE ICINGA2\_CLIENT
 ====================
 
+> [!WARNING]
+> **DEPRECATED:** This role has been migrated to the [adfinis.icinga2 collection](https://github.com/adfinis/ansible-collection-icinga2)
+> and will no longer receive updates. Please use `adfinis.icinga2.icinga2_client` instead.
+
 [![image](https://img.shields.io/github/license/adfinis/ansible-role-icinga2_client.svg?style=flat-square)](https://github.com/adfinis/ansible-role-icinga2_client/blob/master/LICENSE)
 
 [![image](https://img.shields.io/github/actions/workflow/status/adfinis/ansible-role-icinga2_client/ansible-ci.yml?style=flat-square)](https://github.com/adfinis/ansible-role-icinga2_client/actions)
